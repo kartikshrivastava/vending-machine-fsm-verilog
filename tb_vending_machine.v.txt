@@ -1,0 +1,46 @@
+module vending_machine_tb;
+
+    reg clk, rst;
+    reg [1:0] coin;
+    wire product;
+
+    vending_machine vm (
+        .clk(clk),
+        .rst(rst),
+        .coin(coin),
+        .product(product)
+    );
+
+    // Clock generation
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, vending_machine_tb);
+        $monitor("Time=%0t | coin=%b | product=%b | state=%d", $time, coin, product, vm.state);
+        
+        clk = 0;
+        rst = 1;
+        coin = 0;
+        #10;
+        
+        rst = 0;
+        
+        // Insert ₹5
+        coin = 2'b01; #10;
+
+        // Insert ₹10
+        coin = 2'b10; #10;
+
+        // Wait and reset coin input
+        coin = 0; #10;
+
+        // Insert ₹5 + ₹5 + ₹5
+        coin = 2'b01; #10;
+        coin = 2'b01; #10;
+        coin = 2'b01; #10;
+
+        // End simulation
+        $finish;
+    end
+endmodule

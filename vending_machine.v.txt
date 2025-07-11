@@ -1,0 +1,38 @@
+module vending_machine (
+    input clk,
+    input rst,
+    input [1:0] coin,      // 2'b01 = ₹5, 2'b10 = ₹10
+    output reg product
+);
+
+    reg [3:0] state;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            state <= 0;
+            product <= 0;
+        end else begin
+            product <= 0; // default: no product
+
+            case (state)
+                0: begin
+                    if (coin == 2'b01) state <= 5;
+                    else if (coin == 2'b10) state <= 10;
+                end
+                5: begin
+                    if (coin == 2'b01) state <= 10;
+                    else if (coin == 2'b10) state <= 15;
+                end
+                10: begin
+                    if (coin == 2'b01) state <= 15;
+                    else if (coin == 2'b10) state <= 15;
+                end
+                15: begin
+                    product <= 1;  // dispense product
+                    state <= 0;    // reset to initial
+                end
+                default: state <= 0;
+            endcase
+        end
+    end
+endmodule
